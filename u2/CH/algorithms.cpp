@@ -121,8 +121,8 @@ QPolygon Algorithms::jarvisScan(std::vector<QPoint> &points)
 				i_max = i;
 			}
 
-			//Actualize maximum for closer point with the same angle as current "max point"
-			if ((fabs(omega - om_max) < eps) and getDistance2Points(points[i],pj) < getDistance2Points(points[i_max],pj))
+			//Actualize maximum for farther point with the same angle as current "max point"
+			if ((fabs(omega - om_max) < eps) and getDistance2Points(points[i],pj) > getDistance2Points(points[i_max],pj))
 			{
 				om_max = omega;
 				i_max = i;
@@ -347,7 +347,6 @@ QPolygon Algorithms::grahamScan(std::vector<QPoint> &points)
 			for(int j = 0; j < points_by_angle.size(); j++)
 			{
 				//If there are points with the same angle delete the closer one
-				//Warning : It causes that some colinear points near the pivot will not be added to convex hull
 				if (abs(getAngle2Vectors(points_by_angle[j], q, x, q) - ang) < eps)
 				{
 					dist_i = sqrt((points[i].x() - q.x()) * (points[i].x() - q.x()) + (points[i].y() - q.y()) * (points[i].y() - q.y()));
@@ -388,8 +387,8 @@ QPolygon Algorithms::grahamScan(std::vector<QPoint> &points)
 
 	for(int i = 2, j = 0; i < points_by_angle.size(); i++)
 	{
-		//Point in the left half plane or on the line -> add to CH
-		if (getPointLinePosition(points_by_angle[i], ch[j], ch[j+1]) != 0)
+		//Point in the left half plane -> add to CH
+		if (getPointLinePosition(points_by_angle[i], ch[j], ch[j+1]) == 1)
 		{
 			ch.push_back(points_by_angle[i]);
 			j++;
@@ -398,7 +397,7 @@ QPolygon Algorithms::grahamScan(std::vector<QPoint> &points)
 		//Point in the right half plane -> remove last until point is in the left half plane
 		else
 		{
-			while (getPointLinePosition(points_by_angle[i], ch[j], ch[j+1]) == 0)
+			while (getPointLinePosition(points_by_angle[i], ch[j], ch[j+1]) != 1)
 			{
 				ch.remove(j + 1);
 				j--;
@@ -523,6 +522,5 @@ QPolygonF Algorithms::minimumRectangle(QPolygon &ch)
 
 	//Transform rectangle from custom system to global system
 	rotatePolygon(rec, -angle_fin);
-
 	return rec;
 }

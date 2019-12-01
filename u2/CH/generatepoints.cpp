@@ -1,5 +1,6 @@
 #include "generatepoints.h"
 
+
 GeneratePoints::GeneratePoints()
 {
 
@@ -7,34 +8,33 @@ GeneratePoints::GeneratePoints()
 
 std::vector<QPoint> GeneratePoints::generatingRandomField(int &n)
 {
-	//Generate n random points
+	//Generate n-number of random points
 	std::vector<QPoint> points;
 	QPoint p;
 	int x;
 	int y;
 	for (int i = 0; i < n; i++)
 	{
-		x = rand() % 400 + 1;
-		y = rand() % 400 + 1;
+        x = rand() % 400 + 10;
+        y = rand() % 400 + 10;
 		p.setX(x);
 		p.setY(y);
 		points.push_back(p);
 	}
-
 	return points;
 }
 
 std::vector<QPoint> GeneratePoints::generatingCircle(int &n)
 {
-	//Generate n points on circle
+	//Generate n-number of points on circle
 	std::vector<QPoint> points;
 	QPoint p;
-	int xc = 400;
-	int yc = 400;
+    int xc = 210;
+    int yc = 210;
 	int x;
 	int y;
-	double angle = (2 * M_PI)/n;
-	double radius = 210;
+	double angle = (2*M_PI)/n;
+    double radius = 200;
 
 	for (int i = 0; i < n; i++)
 	{
@@ -49,33 +49,35 @@ std::vector<QPoint> GeneratePoints::generatingCircle(int &n)
 
 std::vector<QPoint> GeneratePoints::generatingSquare(int &n)
 {
-	//Generate n x n size square
+	//Generate grid
 	std::vector<QPoint> points;
 	QPoint p;
 	int x;
 	int y;
 
-	for (int i = 0; i < n; i++)
+	//Root of n rounded down
+	int n_new = sqrt(n);
+
+	for (int i = 0; i < n_new; i++)
 	{
-		x = i * 2 + 10;
-		if (n > 1)
+
+		if (n_new == 1)
 		{
-			//Square with more than 1 point
-			for (int j = 0; j < n; j++)
+			p.setX(210);
+			p.setY(210);
+			points.push_back(p);
+		}
+		else
+		{
+			x = i * (400.0 / (n_new - 1)) + 10;
+
+			for (int j = 0; j < n_new; j++)
 			{
-				y = j * 2 + 10;
+				y = j * (400.0 / (n_new - 1)) + 10;
 				p.setX(x);
 				p.setY(y);
 				points.push_back(p);
 			}
-		}
-		else
-		{
-			//1 point
-			y = i * 2 + 10;
-			p.setX(x);
-			p.setY(y);
-			points.push_back(p);
 		}
 	}
 	return points;
@@ -83,18 +85,18 @@ std::vector<QPoint> GeneratePoints::generatingSquare(int &n)
 
 std::vector<QPoint> GeneratePoints::generatingEllipse(int &n)
 {
-	//Generate n points on ellipse
+	//Generate n-number of points on ellipse
 	std::vector<QPoint> points;
 	QPoint p;
-	int xc = 400;
-	int yc = 400;
+    int xc = 210;
+    int yc = 210;
 	int x;
 	int y;
-	double angle = (2 * M_PI)/n;
+	double angle = (2 * M_PI) / n;
 	double a = 200;
 	double b = 100;
 
-	for (int i = 0; i < n; i++)
+	for (int i=0; i<n; i++)
 	{
 		x = xc + a * cos(i * angle);
 		y = yc + b * sin(i * angle);
@@ -107,22 +109,25 @@ std::vector<QPoint> GeneratePoints::generatingEllipse(int &n)
 
 std::vector<QPoint> GeneratePoints::generatingStar(int &n)
 {
-	//Generate n points on star shape
+	//Generate n-number of points on star shape
 	std::vector<QPoint> points;
 	QPoint p;
-	int xc = 400;
-	int yc = 400;
+    int xc = 210;
+    int yc = 210;
 	int x;
 	int y;
 	double angle = (2 * M_PI) / n;
 	double radius_1 = rand() % 200 + 1;
 	double radius_2 = rand() % 200 + 1;
+    while(radius_2 - radius_1 < 20)
+    {
+        radius_2 = rand() % 200 + 1;
+    }
 
 	for (int i = 0; i < n; i++)
 	{
-		if (i%2)
+		if (i % 2)
 		{
-			//Odd points - firts radius
 			x = xc + radius_1 * cos(i * angle);
 			y = yc + radius_1 * sin(i * angle);
 			p.setX(x);
@@ -131,7 +136,6 @@ std::vector<QPoint> GeneratePoints::generatingStar(int &n)
 		}
 		else
 		{
-			//Even points - second radius
 			x = xc + radius_2 * cos(i * angle);
 			y = yc + radius_2 * sin(i * angle);
 			p.setX(x);

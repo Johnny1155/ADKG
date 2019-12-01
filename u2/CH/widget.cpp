@@ -36,13 +36,13 @@ void Widget::on_pushButton_clicked()
 		else
 			ch=Algorithms::grahamScan(points);
 
-		//Strict convex hull
-		if (ui->checkBox->checkState())
-			ch = Algorithms::strictCH(ch);
-
 		//Time ended
 		clock_t t_end = std::clock();
 		clock_t t_final = t_end-t_start;
+
+		//Strict convex hull
+		if (ui->checkBox->checkState())
+			ch = Algorithms::strictCH(ch);
 
 		//Set time into label and convert it from number to QString
 		if (t_final == 0)
@@ -117,11 +117,13 @@ void Widget::on_pushButton_genPoints_clicked()
 void Widget::on_pushButton_minBox_clicked()
 {
 	//Create minimum area enclosing box
-	QPolygon ch=ui->Canvas->getCh();
+	QPolygon ch = ui->Canvas->getCh();
+
+	ch = Algorithms::strictCH(ch);
 
 	if (ch.size() > 2)
 	{
-		QPolygonF ch_new=Algorithms::minimumRectangle(ch);
+		QPolygonF ch_new = Algorithms::minimumRectangle(ch);
 
 		ui->Canvas->setMinBoundary(ch_new);
 		repaint();

@@ -18,6 +18,7 @@ void Draw::mousePressEvent(QMouseEvent *event)
 
 	//Repaint screen
 	repaint();
+
 }
 
 void Draw::paintEvent(QPaintEvent *e)
@@ -25,20 +26,16 @@ void Draw::paintEvent(QPaintEvent *e)
 	QPainter qp(this);
 	qp.begin(this);
 
-	//Draw points
-	if (points.size() < 1000)
-	{
+
+
+	// Draw points
 		for(unsigned int i = 0; i < points.size(); i++)
 		{
 			qp.drawEllipse(points[i].x() - 3, points[i].y() - 3, 6, 6);
 		}
-	}
 
-	//Draw Ch
+	// Draw Ch
 	qp.drawPolygon(ch);
-
-	//Draw minimum area enclosing box
 	qp.drawPolygon(minBoundary);
-
 	qp.end();
 }
