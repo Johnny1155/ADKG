@@ -61,10 +61,13 @@ void Draw::paintEvent(QPaintEvent *event)
         
     }
 
+    QPen slap(Qt::gray, 0);
+    painter.setPen(slap);
+
     //Draw slope and aspect
     if (slope)
     {
-        double k=255.0/90;
+        double k=255.0/180;
 
         for (Triangle t:dtm)
         {
