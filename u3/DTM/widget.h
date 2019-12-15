@@ -63,8 +63,6 @@ private slots:
 
     void on_comboBox_3_currentIndexChanged(int index);
 
-    void on_pushButton_hyps_clicked();
-
 private:
     Ui::Widget *ui;
 };
