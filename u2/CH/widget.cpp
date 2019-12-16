@@ -77,6 +77,7 @@ void Widget::on_pushButton_3_clicked()
 void Widget::on_pushButton_genPoints_clicked()
 {
 	//Generating points
+
 	std::vector<QPoint> points;
 	int n = ui->lineEdit_genPoints->text().toInt();
 
@@ -85,25 +86,28 @@ void Widget::on_pushButton_genPoints_clicked()
 		//Clear widget for warning message if amount of points is correct
 		ui->label_4->clear();
 
+        double canv_w = ui->Canvas->width();
+        double canv_h = ui->Canvas->height();
+
 		if (ui->comboBox_genPoints->currentIndex() == 0)
 		{
-			points=GeneratePoints::generatingRandomField(n);
+            points=GeneratePoints::generatingRandomField(n, canv_w, canv_h);
 		}
 		else if (ui->comboBox_genPoints->currentIndex() == 1)
 		{
-			points=GeneratePoints::generatingCircle(n);
+            points=GeneratePoints::generatingCircle(n, canv_w, canv_h);
 		}
 		else if (ui->comboBox_genPoints->currentIndex() == 2)
 		{
-			points=GeneratePoints::generatingEllipse(n);
+            points=GeneratePoints::generatingEllipse(n, canv_w, canv_h);
 		}
 		else if (ui->comboBox_genPoints->currentIndex() == 3)
-		{
-			points=GeneratePoints::generatingSquare(n);
+        {
+            points=GeneratePoints::generatingSquare(n, canv_w, canv_h);
 		}
 		else if (ui->comboBox_genPoints->currentIndex() == 4)
 		{
-			points=GeneratePoints::generatingStar(n);
+            points=GeneratePoints::generatingStar(n, canv_w, canv_h);
 		}
 	}
 	//Warning message

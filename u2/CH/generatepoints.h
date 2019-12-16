@@ -13,11 +13,11 @@ class GeneratePoints
 public:
 	GeneratePoints();
 
-	static std::vector<QPoint> generatingSquare(int &n);
-	static std::vector<QPoint> generatingCircle(int &n);
-	static std::vector<QPoint> generatingEllipse(int &n);
-	static std::vector<QPoint> generatingRandomField(int &n);
-	static std::vector<QPoint> generatingStar(int &n);
+    static std::vector<QPoint> generatingSquare(int &n, double &w, double &h);
+    static std::vector<QPoint> generatingCircle(int &n, double &w, double &h);
+    static std::vector<QPoint> generatingEllipse(int &n, double &w, double &h);
+    static std::vector<QPoint> generatingRandomField(int &n, double &w, double &h);
+    static std::vector<QPoint> generatingStar(int &n, double &w, double &h);
 
 };
 

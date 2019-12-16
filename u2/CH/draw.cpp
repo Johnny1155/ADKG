@@ -34,8 +34,13 @@ void Draw::paintEvent(QPaintEvent *e)
 			qp.drawEllipse(points[i].x() - 3, points[i].y() - 3, 6, 6);
 		}
 
-	// Draw Ch
-	qp.drawPolygon(ch);
-	qp.drawPolygon(minBoundary);
+    // Draw Minimum area enclosing box
+    qp.drawPolygon(minBoundary);
+
+    QPen convex(Qt::red, 1);
+    qp.setPen(convex);
+
+    //Draw CH
+    qp.drawPolygon(ch);
 	qp.end();
 }
