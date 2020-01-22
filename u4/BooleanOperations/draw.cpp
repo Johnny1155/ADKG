@@ -24,6 +24,8 @@ void Draw::mousePressEvent(QMouseEvent *event)
 
 void Draw::paintEvent(QPaintEvent *event)
 {
+    double r = 5;
+
     QPainter painter(this);
     painter.begin(this);
 
@@ -41,9 +43,42 @@ void Draw::paintEvent(QPaintEvent *event)
     QPen pE(Qt::red);
     pE.setWidth(2);
     painter.setPen(pE);
-    for(int i = 0; i < res.size(); i++)
+    for(unsigned int i = 0; i < res.size(); i++)
     {
         painter.drawLine(res[i].getStart(), res[i].getEnd());
+    }
+
+    QBrush bA;
+    bA.setColor(Qt::green);
+    bA.setStyle(Qt::SolidPattern);
+
+    QBrush bB;
+    bB.setColor(Qt::blue);
+    bB.setStyle(Qt::SolidPattern);
+
+    QBrush bE;
+    bE.setColor(Qt::red);
+    bE.setStyle(Qt::SolidPattern);
+
+    painter.setPen(pA);
+    painter.setBrush(bA);
+    for (unsigned int i = 0; i < intersections_alone_a.size(); i++)
+    {
+        painter.drawEllipse(intersections_alone_a[i].x() - r / 2, intersections_alone_a[i].y() - r / 2, r, r);
+    }
+
+    painter.setPen(pB);
+    painter.setBrush(bB);
+    for (unsigned int i = 0; i < intersections_alone_b.size(); i++)
+    {
+        painter.drawEllipse(intersections_alone_b[i].x() - r / 2, intersections_alone_b[i].y() - r / 2, r, r);
+    }
+
+    painter.setPen(pE);
+    painter.setBrush(bE);
+    for (unsigned int i = 0; i < intersections_alone_res.size(); i++)
+    {
+        painter.drawEllipse(intersections_alone_res[i].x() - r / 2, intersections_alone_res[i].y() - r / 2, r, r);
     }
 
     painter.end();
@@ -53,7 +88,7 @@ void Draw::drawPolygon(QPainter &painter, std::vector<QPointFB> &polygon)
 {
     //Draw polygon
     QPolygon polyg;
-    for(int i = 0; i < polygon.size(); i++)
+    for(unsigned int i = 0; i < polygon.size(); i++)
     {
         polyg.append(QPoint (polygon[i].x(), polygon[i].y()));
     }

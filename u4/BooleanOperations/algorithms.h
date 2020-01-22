@@ -14,11 +14,12 @@ public:
     static TPointPolygonPosition positionPointPolygonWinding(QPointFB &q, std::vector<QPointFB> &pol);
     static T2LinesPosition get2LinesPosition(QPointFB &p1, QPointFB &p2, QPointFB &p3, QPointFB &p4, QPointFB &pi);
     static std::vector<Edge> booleanOperations(std::vector<QPointFB> &polygonA,std::vector<QPointFB> &polygonB, TBooleanOperation operation);
-    static void processIntersection(QPointFB &pi, double &t, std::vector<QPointFB> &polygon, int &i);
+    static void processIntersection(QPointFB &pi, double &t, std::vector<QPointFB> &polygon, unsigned int &i);
     static void computePolygonIntersection(std::vector<QPointFB> &pa, std::vector<QPointFB> &pb);
     static void setPositionsAB(std::vector<QPointFB> &pa, std::vector<QPointFB> &pb);
     static void setPositions(std::vector<QPointFB> &pa, std::vector<QPointFB> &pb);
     static void selectEdges(std::vector<QPointFB> &pol, TPointPolygonPosition position, std::vector<Edge> &edges);
+    static std::vector<QPointF> solve0DProblems(std::vector<QPointFB> &points, std::vector<QPointFB> &pol, std::vector<QPointF> intersections_alone);
 };
 
 #endif // ALGORITHMS_H

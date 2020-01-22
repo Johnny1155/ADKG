@@ -31,6 +31,44 @@ void Widget::on_pushButton_2_clicked()
     TBooleanOperation oper = (TBooleanOperation)(ui->comboBox->currentIndex());
     std::vector<Edge> res = Algorithms::booleanOperations(polA, polB, oper);
 
+    //Set importatnt intersections
+    if(oper == Union)
+    {
+        ui->Canvas->clearInterA();
+        ui->Canvas->clearInterB();
+        ui->Canvas->clearInterRes();
+    }
+
+    else if(oper == Intersect)
+    {
+        std::vector<QPointF> inter_res;
+        inter_res = Algorithms::solve0DProblems(polA, polB, inter_res);
+        inter_res = Algorithms::solve0DProblems(polB, polA, inter_res);
+        ui->Canvas->clearInterA();
+        ui->Canvas->clearInterB();
+        ui->Canvas->setIntersectsAloneRes(inter_res);
+    }
+
+    else if(oper == DifferenceAB)
+    {
+        std::vector<QPointF> inter_b;
+        inter_b = Algorithms::solve0DProblems(polA, polB, inter_b);
+        inter_b = Algorithms::solve0DProblems(polB, polA, inter_b);
+        ui->Canvas->clearInterA();
+        ui->Canvas->clearInterRes();
+        ui->Canvas->setIntersectsAloneB(inter_b);
+    }
+
+    else if(oper == DifferenceBA)
+    {
+        std::vector<QPointF> inter_a;
+        inter_a = Algorithms::solve0DProblems(polA, polB, inter_a);
+        inter_a = Algorithms::solve0DProblems(polB, polA, inter_a);
+        ui->Canvas->clearInterB();
+        ui->Canvas->clearInterRes();
+        ui->Canvas->setIntersectsAloneA(inter_a);
+    }
+
     //Set results and update
     ui->Canvas->setRes(res);
     repaint();
@@ -64,6 +102,9 @@ void Widget::on_pushButton_5_clicked()
 
     ui->Canvas->setA(polA);
     ui->Canvas->setB(polB);
+
+    //Clear old results
+    ui->Canvas->clearResults();
 
     repaint();
 }

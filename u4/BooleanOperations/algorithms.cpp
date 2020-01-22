@@ -61,20 +61,21 @@ TPointPolygonPosition Algorithms::positionPointPolygonWinding(QPointFB &q, std::
     double wn = 0.0;
 
     // Tolerance
-    double eps = 1.0e-6;
+    double eps = 1.0e-4;
 
     // The size of polygon
-    int n = pol.size();
+    unsigned long long n = pol.size();
 
     //Process all points of polygon
-    for (int i = 0; i < n; i++)
+    for (unsigned int i = 0; i < n; i++)
     {
         //Measure angle betweeen two vectors
         double omega = getAngle2Vectors(pol[i], q, pol[(i+1)%n], q);
 
         // Point on boundary
-        if (fabs(fabs(omega) - M_PI) <= eps)
+        if ((fabs(fabs(omega) - M_PI) <= eps) || (count(pol.begin(), pol.end(), q)))
             return On;
+
 
         //Get orientation of the point and the polygon edge
         int orient = getPointLinePosition(q, pol[i], pol[(i+1)%n]);
@@ -100,7 +101,7 @@ TPointPolygonPosition Algorithms::positionPointPolygonWinding(QPointFB &q, std::
 T2LinesPosition Algorithms::get2LinesPosition(QPointFB &p1, QPointFB &p2, QPointFB &p3, QPointFB &p4, QPointFB &pi)
 {
     //Analyze position of two lines
-    double eps = 10e-6;
+    double eps = 1.0e-6;
 
     //Compute vectors
     double ux = p2.x() - p1.x();
@@ -161,19 +162,26 @@ std::vector<Edge> Algorithms::booleanOperations(std::vector<QPointFB> &polygonA,
     //Select edges by position:
 
     //Union
-    if (operation == Union){
+    if (operation == Union)
+    {
         selectEdges(polygonA, Outer, result);
         selectEdges(polygonB, Outer, result);
+        selectEdges(polygonA, On, result);
+        selectEdges(polygonB, On, result);
     }
 
     //Intersect
-    else if(operation == Intersect){
+    else if(operation == Intersect)
+    {
         selectEdges(polygonA, Inner, result);
         selectEdges(polygonB, Inner, result);
+        selectEdges(polygonA, On, result);
+        selectEdges(polygonB, On, result);
     }
 
     //Difference A - B
-    else if(operation == DifferenceAB){
+    else if(operation == DifferenceAB)
+    {
         selectEdges(polygonA, Outer, result);
         selectEdges(polygonB, Inner, result);
     }
@@ -185,15 +193,11 @@ std::vector<Edge> Algorithms::booleanOperations(std::vector<QPointFB> &polygonA,
         selectEdges(polygonB, Outer, result);
     }
 
-    //Singular edges: always
-    selectEdges(polygonA, On, result);
-    selectEdges(polygonB, On, result);
-
     return result;
 }
 
 
-void Algorithms::processIntersection(QPointFB &pi, double &t, std::vector<QPointFB> &polygon, int &i)
+void Algorithms::processIntersection(QPointFB &pi, double &t, std::vector<QPointFB> &polygon, unsigned int &i)
 {
 
     //Process and add intersection
@@ -209,13 +213,15 @@ void Algorithms::processIntersection(QPointFB &pi, double &t, std::vector<QPoint
 
 void Algorithms::computePolygonIntersection(std::vector<QPointFB> &pa, std::vector<QPointFB> &pb)
 {
+    double eps = 1.0e-6;
+
     //Compute intersection of two polygons
-    for (int i = 0; i < pa.size(); i++)
+    for (unsigned int i = 0; i < pa.size(); i++)
     {
         //Create map of intersections
         std::map<double, QPointFB> intersections;
         //Polygon B
-        for (int j = 0; j < pb.size(); j++)
+        for (unsigned int j = 0; j < pb.size(); j++)
         {
             QPointFB pi;
             if (get2LinesPosition(pa[i], pa[(i+1)%pa.size()], pb[j], pb[(j+1)%pb.size()], pi) == Intersected)
@@ -229,6 +235,50 @@ void Algorithms::computePolygonIntersection(std::vector<QPointFB> &pa, std::vect
 
                 //Process intersection
                 processIntersection(pi, beta, pb, j);
+            }
+
+            else if (get2LinesPosition(pa[i], pa[(i+1)%pa.size()], pb[j], pb[(j+1)%pb.size()], pi) == Identical)
+            {
+                double betaA1 = (pa[i].x() - pb[j].x()) / (pb[(j+1)%pb.size()].x() - pb[j].x());
+                double betaA2 = (pa[(i+1)%pa.size()].x() - pb[j].x()) / (pb[(j+1)%pb.size()].x() - pb[j].x());
+                double alphaB1 = (pb[j].x() - pa[i].x()) / (pa[(i+1)%pa.size()].x() - pa[i].x());
+                double alphaB2 = (pb[(j+1)%pb.size()].x() - pa[i].x()) / (pa[(i+1)%pa.size()].x() - pa[i].x());
+
+                if ((betaA1 >= eps) && (betaA1 <= (1 - eps)))
+                {
+                    pi.setX(pa[i].x());
+                    pi.setY(pa[i].y());
+                    pi.setBeta(betaA1);
+                    pi.setAlpha(0);
+                    processIntersection(pi, betaA1, pb, j);
+                }
+
+                if ((betaA2 >= eps) && (betaA2 <= (1 - eps)))
+                {
+                    pi.setX(pa[(i+1)%pa.size()].x());
+                    pi.setY(pa[(i+1)%pa.size()].y());
+                    pi.setBeta(betaA1);
+                    pi.setAlpha(1);
+                    processIntersection(pi, betaA1, pb, j);
+                }
+
+                if ((alphaB1 >= eps) && (alphaB1 <= (1 - eps)))
+                {
+                    pi.setX(pb[j].x());
+                    pi.setY(pb[j].y());
+                    pi.setAlpha(alphaB1);
+                    pi.setBeta(0);
+                    intersections[alphaB1] = pi;
+                }
+
+                if ((alphaB2 >= eps) && (alphaB2 <= (1 - eps)))
+                {
+                    pi.setX(pb[(j+1)%pb.size()].x());
+                    pi.setY(pb[(j+1)%pb.size()].y());
+                    pi.setAlpha(alphaB2);
+                    pi.setBeta(1);
+                    intersections[alphaB2] = pi;
+                }
             }
         }
 
@@ -261,8 +311,8 @@ void Algorithms::setPositionsAB(std::vector<QPointFB> &pa, std::vector<QPointFB>
 void Algorithms::setPositions(std::vector<QPointFB> &pa, std::vector<QPointFB> &pb)
 {
     //Set position of edges of polygon to another polygon
-    int n = pa.size();
-    for(int i = 0; i < n; i++)
+    unsigned long long n = pa.size();
+    for(unsigned int i = 0; i < n; i++)
     {
         //Calculate mid-point of edge
         double mx = (pa[i].x() + pa[(i + 1)%n].x()) / 2;
@@ -281,7 +331,7 @@ void Algorithms::setPositions(std::vector<QPointFB> &pa, std::vector<QPointFB> &
 void Algorithms::selectEdges(std::vector<QPointFB> &pol, TPointPolygonPosition position, std::vector<Edge> &edges)
 {
     //Select edges according to position
-    for(int i = 0; i < pol.size(); i++)
+    for(unsigned int i = 0; i < pol.size(); i++)
     {
         //Apropriate edge found
         if (pol[i].getPosition() == position)
@@ -292,3 +342,52 @@ void Algorithms::selectEdges(std::vector<QPointFB> &pol, TPointPolygonPosition p
         }
     }
 }
+
+
+std::vector<QPointF> Algorithms::solve0DProblems(std::vector<QPointFB> &points, std::vector<QPointFB> &pol, std::vector<QPointF> intersections_alone)
+{
+    //Find intersections which are important in boolean operations but not part of resultant edges
+
+    QPointF q;
+
+    //Middle-points of edges (i,i+1) and (i+1, i+2)
+    QPointFB m1;
+    QPointFB m2;
+
+    computePolygonIntersection(points,pol);
+
+    for (unsigned int i = 0; i < pol.size(); i++)
+    {
+        m1.setX((points[i].x() + points[(i+1)%points.size()].x()) / 2);
+        m1.setY((points[i].y() + points[(i+1)%points.size()].y()) / 2);
+
+        m2.setX((points[(i+1)%points.size()].x() + points[(i+2)%points.size()].x()) / 2);
+        m2.setY((points[(i+1)%points.size()].y() + points[(i+2)%points.size()].y()) / 2);
+
+        //Positions of three neighbors
+        TPointPolygonPosition pos0 = positionPointPolygonWinding(m1,pol);
+        TPointPolygonPosition pos1 = positionPointPolygonWinding(points[(i+1)%points.size()],pol);
+        TPointPolygonPosition pos2 = positionPointPolygonWinding(m2,pol);
+
+        //If the middle one is on the border and others are on the same side
+        if ((pos0 == Outer) && (pos1 == On) && (pos2 == Outer) && (pos1 == On))
+        {
+            double x = points[(i + 1)%points.size()].x();
+            double y = points[(i + 1)%points.size()].y();
+            q.setX(x);
+            q.setY(y);
+
+            if (count(intersections_alone.begin(), intersections_alone.end(), q) == 0)
+                intersections_alone.push_back(q);
+
+        }
+    }
+
+    return intersections_alone;
+}
+
+
+
+
+
+
