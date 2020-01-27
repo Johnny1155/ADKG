@@ -93,8 +93,7 @@ TPointPolygonPosition Algorithms::positionPointPolygonWinding(QPointFB &q, std::
         return Inner;
 
     //Point outside polygon
-    if (fabs(fabs(wn)) <= eps)
-        return Outer;
+    return Outer;
 }
 
 
