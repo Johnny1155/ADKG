@@ -3,7 +3,7 @@
 #include <map>
 #include "qpointfb.h"
 #include "types.h"
-
+#include <iostream>
 
 Algorithms::Algorithms()
 {
@@ -61,7 +61,7 @@ TPointPolygonPosition Algorithms::positionPointPolygonWinding(QPointFB &q, std::
     double wn = 0.0;
 
     // Tolerance
-    double eps = 1.0e-4;
+    double eps = 1.0e-2;
 
     // The size of polygon
     unsigned long long n = pol.size();
@@ -94,7 +94,8 @@ TPointPolygonPosition Algorithms::positionPointPolygonWinding(QPointFB &q, std::
         return Inner;
 
     //Point outside polygon
-    return Outer;
+    if (fabs(fabs(wn)) <= eps)
+        return Outer;
 }
 
 
@@ -358,7 +359,7 @@ std::vector<QPointF> Algorithms::solve0DProblems(std::vector<QPointFB> &points, 
 
     computePolygonIntersection(points,pol);
 
-    for (unsigned int i = 0; i < pol.size(); i++)
+    for (unsigned int i = 0; i < points.size(); i++)
     {
         m1.setX((points[i].x() + points[(i+1)%points.size()].x()) / 2);
         m1.setY((points[i].y() + points[(i+1)%points.size()].y()) / 2);
@@ -366,13 +367,22 @@ std::vector<QPointF> Algorithms::solve0DProblems(std::vector<QPointFB> &points, 
         m2.setX((points[(i+1)%points.size()].x() + points[(i+2)%points.size()].x()) / 2);
         m2.setY((points[(i+1)%points.size()].y() + points[(i+2)%points.size()].y()) / 2);
 
+        std::cout<< m1.x() << "   " << m1.y()<<std::endl;
+        std::cout<< points[(i+1)%points.size()].x() << "   " << points[(i+1)%points.size()].y()<<std::endl;
+        std::cout<< m2.x() << "   " << m2.y()<<std::endl;
+
+
         //Positions of three neighbors
         TPointPolygonPosition pos0 = positionPointPolygonWinding(m1,pol);
         TPointPolygonPosition pos1 = positionPointPolygonWinding(points[(i+1)%points.size()],pol);
         TPointPolygonPosition pos2 = positionPointPolygonWinding(m2,pol);
 
-        //If the middle one is on the border and others are on the same side
-        if ((pos0 == Outer) && (pos1 == On) && (pos2 == Outer) && (pos1 == On))
+        std::cout<< pos0 <<std::endl;
+        std::cout<< pos1 <<std::endl;
+        std::cout<< pos2 <<std::endl;
+
+        //If the middle one is on the border and edges are outer
+        if ((pos0 == Outer) && (pos1 == On) && (pos2 == Outer))
         {
             double x = points[(i + 1)%points.size()].x();
             double y = points[(i + 1)%points.size()].y();
