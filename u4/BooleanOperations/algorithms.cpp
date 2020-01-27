@@ -3,7 +3,6 @@
 #include <map>
 #include "qpointfb.h"
 #include "types.h"
-#include <iostream>
 
 Algorithms::Algorithms()
 {
@@ -367,19 +366,10 @@ std::vector<QPointF> Algorithms::solve0DProblems(std::vector<QPointFB> &points, 
         m2.setX((points[(i+1)%points.size()].x() + points[(i+2)%points.size()].x()) / 2);
         m2.setY((points[(i+1)%points.size()].y() + points[(i+2)%points.size()].y()) / 2);
 
-        std::cout<< m1.x() << "   " << m1.y()<<std::endl;
-        std::cout<< points[(i+1)%points.size()].x() << "   " << points[(i+1)%points.size()].y()<<std::endl;
-        std::cout<< m2.x() << "   " << m2.y()<<std::endl;
-
-
         //Positions of three neighbors
         TPointPolygonPosition pos0 = positionPointPolygonWinding(m1,pol);
         TPointPolygonPosition pos1 = positionPointPolygonWinding(points[(i+1)%points.size()],pol);
         TPointPolygonPosition pos2 = positionPointPolygonWinding(m2,pol);
-
-        std::cout<< pos0 <<std::endl;
-        std::cout<< pos1 <<std::endl;
-        std::cout<< pos2 <<std::endl;
 
         //If the middle one is on the border and edges are outer
         if ((pos0 == Outer) && (pos1 == On) && (pos2 == Outer))
